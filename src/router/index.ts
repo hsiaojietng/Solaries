@@ -1,12 +1,26 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
+
+//Firebase imports
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    getAuth,
+    beforeAuthStateChanged
+} from 'firebase/auth'
 
 import type { AuthTypes } from "./AuthType";
 import AuthType from "./AuthType";
 
 import Home from "../views/Home.vue";
+import Login from "../views/Login.vue";
+import Signup from "../views/Signup.vue";
+import Dashboard from "../views/Dashboard.vue";
+import RoofListing from "../views/RoofListing.vue";
+import AddRoof from "../views/AddRoof.vue";
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
 
   // Alternatively, import 'createWebHistory' to use history mode instead
   // history: createWebHistory(),
@@ -31,11 +45,37 @@ const router = createRouter({
     },
 
     /* Public only routes */
-    // {
-    //   path: "/login",
-    //   name: "login",
-    //   component: () => import("../views/Login.vue"),
-    // },
+    {
+      path: "/login",
+      name: "login",
+      component: Login,
+    },
+
+    {
+      path: "/signup",
+      name: "signup",
+      component: Signup,
+    },
+
+    {
+      path: "/dashboard",
+      name: "dashboard",
+      component: Dashboard,
+    },
+
+    /* Private routes */
+
+    {
+      path: "/rooflisting",
+      name: "rooflisting",
+      component: RoofListing,
+    },
+
+    {
+      path: "/addroof",
+      name: "addroof",
+      component: AddRoof,
+    },
 
     /* Public routes */
     {
@@ -54,7 +94,7 @@ const requiredAuth = (AuthRequirements: AuthTypes) => ({
 
 // Attach a Router Gaurd Middleware function to run when navigation is made before the actual navigation.
 // The guard checks if user's current auth status matches required auth status for the route being accessed.
-router.beforeEach(function (to, _from, next) {
+router.beforeEach(async (to, _from, next) => {
   // @todo Get the user's auth status from your auth service/lib
   const isAuthenticated = true;
 
@@ -67,10 +107,10 @@ router.beforeEach(function (to, _from, next) {
   /* Call the next middleware based on authentication status */
 
   // If route is auth protected and user not logged in, redirect to login page
-  if (AuthType_required_is.private && !isAuthenticated) next({ name: "login" });
+  if (AuthType_required_is.private && !isAuthenticated) next({ name: "/login" });
   // If route is public only and user is logged in, redirect to default private route of home
   else if (AuthType_required_is.public_only && isAuthenticated)
-    next({ name: "home" });
+    next({ name: "/home" });
   // Else, just continue navigation as per user request.
   else next();
 });

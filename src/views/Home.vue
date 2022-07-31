@@ -43,7 +43,7 @@
     <component :is="'Demo' + API_type" :timeAsProp="timeValue">
       <!-- Example on how to use a named slot -->
       <template #title>
-        <p class="title">Vue3 Bulma Template ({{ API_type }})</p>
+        <p class="title">Solaries ({{ API_type }})</p>
       </template>
     </component>
 
@@ -79,11 +79,12 @@ import { defineComponent } from "vue";
 
 import DemoOptions from "../components/DemoOptions.vue";
 import DemoComposition from "../components/DemoComposition.vue";
+import Login from "./Login.vue";
 
 export default defineComponent({
   name: "Home",
 
-  components: { DemoOptions, DemoComposition },
+  components: { DemoOptions, DemoComposition, Login },
 
   data(): {
     API_type: "Options" | "Composition";

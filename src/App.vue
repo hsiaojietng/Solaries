@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import Navbar from "./components/Navbar.vue";
-</script>
-
 <template>
   <Navbar />
 
@@ -15,8 +11,13 @@ import Navbar from "./components/Navbar.vue";
     https://v3-migration.vuejs.org/new/fragments.html#overview
     https://vuejs.org/guide/components/attrs.html#fallthrough-attributes
   -->
-  <router-view class="container" />
+  <router-view />
 </template>
+
+<script setup lang="ts">
+import Navbar from "./components/Navbar.vue"
+
+</script>
 
 <style>
 /* Unscoped styles that applies to the entire application */

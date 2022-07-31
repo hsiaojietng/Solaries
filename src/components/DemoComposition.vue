@@ -155,3 +155,9 @@ async function getData() {
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: "DemoComposition",
+}
+</script>

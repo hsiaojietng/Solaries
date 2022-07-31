@@ -13,11 +13,28 @@ oof._baseUrl =
 // Else use this to read a single URL from the .env file
 // oof._baseUrl = import.meta.env.VITE_API_URL;
 
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBp9-CwzTMSyPV6M0Xl0Vv4AvWyuai-fo8",
+  authDomain: "solaries-3bcb4.firebaseapp.com",
+  projectId: "solaries-3bcb4",
+  storageBucket: "solaries-3bcb4.appspot.com",
+  messagingSenderId: "1097502896553",
+  appId: "1:1097502896553:web:54c1ed1a1ecfc00010d4b8",
+  measurementId: "G-VQLMR5RB12"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import router from "./router/index";
 import App from "./App.vue";
+import './Axios.js'
 
 // Create new vue app
 createApp(App)
