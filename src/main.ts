@@ -15,6 +15,7 @@ oof._baseUrl =
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBp9-CwzTMSyPV6M0Xl0Vv4AvWyuai-fo8",
@@ -28,6 +29,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 import { createApp } from "vue";
 import { createPinia } from "pinia";
@@ -41,3 +43,5 @@ createApp(App)
   .use(router)
   .use(createPinia().use(piniaPluginPersistedstate))
   .mount("#app");
+
+  export {app, db}
