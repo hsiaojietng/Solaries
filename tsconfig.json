@@ -25,6 +25,7 @@
     "resolveJsonModule": true,
 
     "strict": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "strictNullChecks": false
   }
 }

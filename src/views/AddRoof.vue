@@ -19,7 +19,9 @@
                 <span class="file-icon"></span>
                 <span class="file-label"> Choose an image... </span>
               </span>
-              <img :src="roof.imageUrl"  alt="" />
+              <div v-for="(img, i) in roof.imageUrl" :key="i" class="d-flex">
+                <img :src="img" />
+              </div>
             </label>
           </div>
         </div>
@@ -61,18 +63,10 @@
             <input
               class="input"
               type="text"
-              placeholder="e.g. 700"
+              placeholder="e.g. 700 (in m²)"
               name="roofsize"
               v-model="roof.size"
             />
-          </p>
-          <p class="control">
-            <span class="select">
-              <select>
-                <option>m²</option>
-                <option>feet²</option>
-              </select>
-            </span>
           </p>
         </div>
       </div>
@@ -88,7 +82,7 @@
           <p class="control">
             <span class="select">
               <select name="buildingtype" v-model="roof.buildingtype">
-                <option>Bungalow</option>
+                <option selected>Bungalow</option>
                 <option>Terrace</option>
                 <option>Semi-D</option>
                 <option>Condominium</option>
@@ -119,6 +113,26 @@
       </div>
     </div>
   </div>
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-4">
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label for="" class="label">Quotation for solar panels: </label>
+          </div>
+          <p class="control">
+            <input
+              class="input"
+              type="text"
+              placeholder="e.g. 10000"
+              name="investment"
+              v-model="roof.investment"
+            />
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="columns is-centered">
     <div class="column is-4">
       <button
@@ -135,19 +149,26 @@
 import { defineComponent } from "vue";
 import { app, db } from "../main";
 import { addDoc, collection } from "firebase/firestore";
-//import { getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 export default defineComponent({
   name: "AddRoof",
   data() {
     return {
       roof: {
-        imageUrl: "",
+        imageUrl: [""],
         location: "",
         buildingtype: "",
         energy: "",
         size: "",
-        image: null,
+        fund: 0,
+        investment: null, 
       },
     };
   },
@@ -155,16 +176,7 @@ export default defineComponent({
   methods: {
     async submitRoof() {
       // Create a root reference
-      //const storage = getStorage();
       try {
-        if (!this.roof.image) {
-          alert("Please provide images of the house/roof!");
-          return;
-        }
-        // const imageRef = ref(storage, "images/" + this.roof.imageUrl);
-        // uploadBytes(imageRef, this.roof.image).then((snapshot) => {
-        //   console.log("Uploaded the file!");
-        // });
         const docRef = await addDoc(collection(db, "roofs"), this.roof);
         console.log("Document written with ID: ", docRef.id);
         this.reset();
@@ -173,20 +185,52 @@ export default defineComponent({
       }
     },
     reset() {
-      Object.assign(this.$data, this.$options.data.apply(this));
+      this.roof.location = "";
+      this.roof.buildingtype = "";
+      this.roof.energy = "";
+      this.roof.size = "";
+      this.roof.investment = "";
+      this.roof.imageUrl.length = 0; //clears the array
     },
-    onFilePicked(event) {
-      const files = event.target.files;
+    onFilePicked(event: Event) {
+      const target = event.target as HTMLInputElement;
+      const files = target.files;
       let filename = files[0].name;
       if (filename.lastIndexOf(".") <= 0) {
         return alert("Please upload a file with valid extension!");
       }
-      const fileReader = new FileReader();
-      fileReader.addEventListener("load", () => {
-        this.roof.imageUrl = fileReader.result as string;
-      });
-      fileReader.readAsDataURL(files[0]);
-      this.roof.image = files[0];
+
+      const storage = getStorage();
+      const storageRef = ref(storage, "roof/" + filename);
+
+      const uploadTask = uploadBytesResumable(storageRef, files[0]);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            this.roof.imageUrl.push(downloadURL);
+          });
+        }
+      );
     },
   },
 });
